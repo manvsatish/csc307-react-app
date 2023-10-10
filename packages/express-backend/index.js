@@ -82,14 +82,15 @@ app.get('/users/:id', (req, res) => {
 });
 
 const addUser = (user) => {
+    user.id = generateId();  // Assign a new ID
     users['users_list'].push(user);
-    return user;
+    return user;  // Return the updated user
 }
 
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    const newUser = addUser(userToAdd);  // Get the updated user with ID
+    res.status(201).send(newUser);  // Send the new user as response
 });
 
 const findUsersByNameAndJob = (name, job) => {
@@ -129,7 +130,7 @@ app.get('/users', (req, res) => {
     }
 });
 
-const deleteUser = (user) => {
+const deleteUserById = (id) => {
     const index = users['users_list'].findIndex(user => user['id'] === id);
     if (index !== -1) {
         users['users_list'].splice(index, 1);
@@ -143,8 +144,12 @@ app.delete('/users/:id', (req, res) => {
     const wasDeleted = deleteUserById(id);
 
     if (wasDeleted) {
-        res.send({ message: 'User deleted successfully.' });
+        res.status(204).send();  // No content
     } else {
         res.status(404).send({ message: 'User not found.' });
     }
 });
+
+const generateId = () => {
+    return Math.random().toString(36).substring(2, 8);
+};
